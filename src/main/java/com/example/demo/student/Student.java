@@ -1,23 +1,20 @@
 package com.example.demo.student;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.GenericGenerator;
+
 import java.time.LocalDate;
 import java.time.Period;
 
 @Entity
 @Table
 public class Student {
+
     @Id
-    @SequenceGenerator(
-            name = "student_sequence",
-            sequenceName = "student_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "student_sequence"
-    )
-    private Long id;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    private String id;
     private String name;
     private String email;
     private LocalDate dob;
@@ -27,7 +24,7 @@ public class Student {
     public Student() {
     }
 
-    public Student(Long id, String name, String email, LocalDate dob) {
+    public Student(String id, String name, String email, LocalDate dob) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -40,11 +37,11 @@ public class Student {
         this.dob = dob;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

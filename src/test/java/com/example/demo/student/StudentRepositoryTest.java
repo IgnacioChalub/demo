@@ -4,13 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.List;
-import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 
@@ -32,9 +28,11 @@ public class StudentRepositoryTest {
         underTest.save(student);
 
         // // when
-        //Optional<Student> studentOptional = underTest.findStudentByEmail(email);
+        Student studentOptional = underTest.findStudentByEmail(email).get();
         
         // // then
-        // assertThat(studentOptional).isEqualTo(student);
+        assertThat(studentOptional.getName()).isEqualTo(student.getName());
+        assertThat(studentOptional.getEmail()).isEqualTo(student.getEmail());
+        assertThat(studentOptional.getAge()).isEqualTo(student.getAge());
     }
 }
