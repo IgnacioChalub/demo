@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,20 @@ public class StudentRepositoryTest {
         );
         underTest.save(student);
 
-        // // when
-        Student studentOptional = underTest.findStudentByEmail(email).get();
+        // when
+        Student savedStudent = underTest.findStudentByEmail(email).get();
         
-        // // then
-        assertThat(studentOptional.getName()).isEqualTo(student.getName());
-        assertThat(studentOptional.getEmail()).isEqualTo(student.getEmail());
-        assertThat(studentOptional.getAge()).isEqualTo(student.getAge());
+        // then
+        assertThat(student).isEqualTo(savedStudent); 
     }
+
+    @Test
+    void itShouldNotFindStudentByEmailIfStudentDoesNotExists() {
+        String email  = "ignacio@mail.com";
+
+        Optional<Student> studentOptional = underTest.findStudentByEmail(email);
+
+        assertThat(studentOptional.isPresent()).isEqualTo(false);
+    }
+
 }
