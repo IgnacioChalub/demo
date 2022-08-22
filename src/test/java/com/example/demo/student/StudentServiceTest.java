@@ -1,7 +1,7 @@
 package com.example.demo.student;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
@@ -14,8 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class StudentServiceTest {
    
     @Mock
@@ -73,4 +76,46 @@ public class StudentServiceTest {
 
         verify(studentRepository, never()).save(student);
     }
+
+    @Test
+    void canDeleteStudentThrowErrorIfStudenDoesNotExist() {
+        String studentId = "some id";
+        given(studentRepository.existsById(studentId)).willReturn(false);
+
+        assertThatThrownBy(() -> underTest.deleteStudent(studentId))
+            .isInstanceOf(IllegalStateException.class)   
+            .hasMessageContaining("student with id " + studentId + " does not exist");
+
+        verify(studentRepository, never()).deleteById(studentId);
+    }
+
+    @Test
+    void updateStudentThrowErrorIfStudentDoesNotExist() {
+        String studentId = "some id";
+        given(studentRepository.findById(studentId)).willReturn(Optional.empty());
+        assertThatThrownBy(() -> underTest.updateStudent(studentId, "name", "email"))
+            .isInstanceOf(IllegalStateException.class)   
+            .hasMessageContaining("student with id " + studentId + " does not exist");
+    }
+
+   @Test
+    void canUpdateStudent() {
+        String studentId = "some id";
+        Student student = new Student(
+            studentId,
+            "ignacio",
+            "ignacio@mail.com",
+            LocalDate.of(2000, Month.JANUARY,5)
+        );
+        Optional<Student> studentOptional = Optional.of(student);
+        given(studentRepository.findById(studentId)).willReturn(studentOptional);
+
+        String newName = "Nacho";
+        String newEmail = "nacho@mail.com";
+        underTest.updateStudent(studentId, newName, newEmail);
+
+        assertThat(student.getName()).isEqualTo(newName);
+        assertThat(student.getEmail()).isEqualTo(newEmail);
+    }
+
 }

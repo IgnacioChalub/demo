@@ -30,21 +30,26 @@ public class StudentService {
         studentRepository.save(student);
     }
 
-    public void deleteStudent(Long studentId) {
+    public void deleteStudent(String studentId) {
         boolean exists = studentRepository.existsById(studentId);
         if(!exists) {
             throw new IllegalStateException(
-                    "student with id " + studentId + " does not exists"
+                    "student with id " + studentId + " does not exist"
             );
         }
         studentRepository.deleteById(studentId);
     }
 
     @Transactional
-    public void updateStudent(Long studentId, String name, String email) {
-        Student student= studentRepository.findById(studentId).orElseThrow(() -> new IllegalStateException(
-                "student with id " + studentId + " does not exist"
-        ));
+    public void updateStudent(String studentId, String name, String email) {
+        Optional<Student> studentOptionalById = studentRepository.findById(studentId);
+        if(!studentOptionalById.isPresent()) {
+            throw new IllegalStateException(
+                    "student with id " + studentId + " does not exist"
+            );
+        }
+        Student student = studentOptionalById.get();
+
         if(name != null && name.length() > 0 && !Objects.equals(student.getName(), name)) {
             student.setName(name);
         }
